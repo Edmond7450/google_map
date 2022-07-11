@@ -13,8 +13,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 BASE_URL = 'https://www.google.de/maps'
 
-REGIONS = ['Rheinland-Pfalz', 'Baden-Württemberg', 'Hessen', 'Bayern']
-QUERIES = ['Pflegedienst', 'ambulante pflege', 'betreutes wohnen', 'tagespflege','intensivpflege']
+REGIONS = ['Augsburg','Stuttgart','Baden-Württemberg','Bayern','Hessen','Rheinland-Pfalz']
+QUERIES = ['Investment Bank', 'Merger & Aquisition', 'Investmentbank', 'Großbanken','Investmentbanking','Unternehmensinvestmentbank','corpoarate investment bank','Merger And Aquisition Bank','Finanzierungsunternehmen','unabhängige Corporate-Finance-Boutique-Investmentbank','Corporate-Finance-Boutique','M&A','Corporate Finance','Dept Advisory','Corporate Finance Dienstleister','Dept Advisory','Merger and Aquisitions']
 
 
 def get_urls():
@@ -29,12 +29,12 @@ def get_urls():
                 ele_search.send_keys(f'{query} in {region}')
                 ele_search.send_keys(Keys.ENTER)
                 time.sleep(3)
-                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="pane"]/div/div[1]/div/div/div[4]/div[1]//a')))
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@role="main"]/div/div//a')))
             except:
                 continue
 
             while True:
-                ele_container = driver.find_element_by_xpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[1]')
+                ele_container = driver.find_element(By.XPATH, '//*[@role="main"]/div/div')
                 scrollHeight = int(ele_container.get_attribute('scrollHeight'))
                 scrollPos = 0
                 while (scrollPos < scrollHeight):
@@ -43,15 +43,16 @@ def get_urls():
                     time.sleep(1)
                     scrollHeight = int(ele_container.get_attribute('scrollHeight'))
 
-                results = ele_container.find_elements_by_xpath('.//a')
+                results = ele_container.find_elements(By.XPATH, './/a')
                 for result in results:
                     try:
-                        urls.append(result.get_attribute('href'))
+                        if result.get_attribute('href'):
+                            urls.append(result.get_attribute('href'))
                     except:
                         pass
 
                 try:
-                    driver.find_element_by_xpath('//button[contains(@class, "hV1iCc noprint")][2]').click()
+                    driver.find_element(By.XPATH, '//button[contains(@class, "hV1iCc")][2]').click()
                     time.sleep(3)
                 except:
                     break
@@ -71,28 +72,28 @@ def get_page(urls):
             else:
                 mode = 'a+'
 
-            company_name = driver.find_element_by_xpath('//h1').text.strip()
+            company_name = driver.find_element(By.XPATH, '//h1').text.strip()
             if company_name.find(',') > 0:
                 company_name = f'"{company_name}"'
             try:
-                address = driver.find_element_by_xpath('//button[@data-item-id="address"]').text.strip()
+                address = driver.find_element(By.XPATH, '//button[@data-item-id="address"]').text.strip()
                 if address.find(',') > 0:
                     address = f'"{address}"'
             except:
                 address = ''
             try:
-                website = driver.find_element_by_xpath('//button[@data-item-id="authority"]').text.strip()
+                website = driver.find_element(By.XPATH, '//button[@data-item-id="authority"]').text.strip()
             except:
                 website = ''
             try:
-                phone_number = driver.find_element_by_xpath('//button[starts-with(@data-item-id, "phone:")]').text.strip()
+                phone_number = driver.find_element(By.XPATH, '//button[starts-with(@data-item-id, "phone:")]').text.strip()
                 if phone_number.find(',') > 0:
                     phone_number = f'"{phone_number}"'
             except:
                 phone_number = ''
 
             try:
-                plus_code = driver.find_element_by_xpath('//button[@data-item-id="oloc"]').text.strip()
+                plus_code = driver.find_element(By.XPATH, '//button[@data-item-id="oloc"]').text.strip()
                 if plus_code.find(',') > 0:
                     plus_code = f'"{plus_code}"'
             except:
@@ -109,7 +110,7 @@ def main():
 
     try:
         WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, '//c-wiz//form//button')))
-        driver.find_element_by_xpath('//c-wiz//form//button').click()
+        driver.find_element(By.XPATH, '//c-wiz//form//button').click()
     except:
         pass
 
